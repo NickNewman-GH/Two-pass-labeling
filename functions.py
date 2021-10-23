@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 def check(image, y, x):
     if not 0 <= x < image.shape[1]:
@@ -38,7 +39,7 @@ def two_pass_labeling(binary_image):
     for i in range(binary_image.shape[0]):
         for j in range(binary_image.shape[1]):
             if binary_image[i, j] != 0:
-                ns = neigh2(image, i, j)
+                ns = neigh2(binary_image, i, j)
                 if ns[0] is None and ns[1] is None:
                     m = label
                     label += 1
@@ -75,3 +76,37 @@ def two_pass_labeling(binary_image):
                 if new_label != labeled[i, j]:
                     labeled[i, j] = new_label
     return labeled
+
+if __name__ == "__main__":
+    B = np.zeros((20, 20), dtype='int32')
+    
+    B[1:-1, -2] = 1
+    
+    B[1, 1:5] = 1
+    B[1, 7:12] = 1
+    B[2, 1:3] = 1
+    B[2, 6:8] = 1
+    B[3:4, 1:7] = 1
+    
+    B[7:11, 11] = 1
+    B[7:11, 14] = 1
+    B[10:15, 10:15] = 1
+    
+    B[5:10, 5] = 1
+    B[5:10, 6] = 1
+
+    LB = two_pass_labeling(B)
+    
+    print("Labels - ", list(set(LB.ravel()))[1:])
+    
+    plt.figure(figsize=(12, 5))
+    plt.subplot(121)
+    plt.imshow(B, cmap="hot")
+    plt.colorbar(ticks=range(int(2)))
+    plt.axis("off")
+    plt.subplot(122)
+    plt.imshow(LB.astype("uint8"), cmap="hot")
+    plt.colorbar()
+    plt.axis("off")
+    plt.tight_layout()
+    plt.show()
